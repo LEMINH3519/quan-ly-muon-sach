@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư Viện Số Thông Minh</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome cho các icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <h1><i class="fa-solid fa-book-open-reader"></i> Thư Viện Số Tương Lai</h1>
+            <p>Quản lý và tra cứu sách học tập dễ dàng</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Khu vực Thống kê -->
+        <section class="dashboard">
+            <div class="stat-card">
+                <i class="fa-solid fa-books"></i>
+                <div class="stat-info">
+                    <h3>Tổng số sách</h3>
+                    <p id="total-books">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fa-solid fa-check-circle" style="color: #28a745;"></i>
+                <div class="stat-info">
+                    <h3>Sách sẵn sàng</h3>
+                    <p id="available-books">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fa-solid fa-user-clock" style="color: #ffc107;"></i>
+                <div class="stat-info">
+                    <h3>Đang cho mượn</h3>
+                    <p id="borrowed-books">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Khu vực Công cụ: Tìm kiếm, Lọc, Thêm mới -->
+        <section class="toolbar">
+            <div class="search-filter">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Tìm kiếm tên sách hoặc tác giả...">
+                </div>
+                <select id="category-filter">
+                    <option value="all">Tất cả thể loại</option>
+                    <option value="Giáo trình">Giáo trình</option>
+                    <option value="Sách tham khảo">Sách tham khảo</option>
+                    <option value="Văn học">Văn học</option>
+                    <option value="Khoa học">Khoa học</option>
+                    <option value="Công nghệ IT">Công nghệ IT</option>
+                    <option value="Khác">Khác</option>
+                </select>
+            </div>
+            <button id="btn-add-book" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Thêm Sách Mới
+            </button>
+        </section>
+
+        <!-- Khu vực Lưới hiển thị Sách -->
+        <section class="book-grid" id="book-grid">
+            <!-- Sách sẽ được render ở đây bằng JavaScript -->
+        </section>
+        
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <i class="fa-solid fa-folder-open"></i>
+            <p>Không tìm thấy cuốn sách nào!</p>
+        </div>
+    </main>
+
+    <!-- Modal Thêm/Sửa Sách -->
+    <div id="book-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">Thêm Sách Mới</h2>
+            <form id="book-form">
+                <input type="hidden" id="book-id">
+                
+                <div class="form-group">
+                    <label for="book-title">Tên sách (*)</label>
+                    <input type="text" id="book-title" required placeholder="Nhập tên sách...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="book-author">Tác giả (*)</label>
+                    <input type="text" id="book-author" required placeholder="Nhập tên tác giả...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="book-category">Thể loại</label>
+                    <select id="book-category">
+                        <option value="Giáo trình">Giáo trình</option>
+                        <option value="Sách tham khảo">Sách tham khảo</option>
+                        <option value="Văn học">Văn học</option>
+                        <option value="Khoa học">Khoa học</option>
+                        <option value="Công nghệ IT">Công nghệ IT</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="book-status">Trạng thái</label>
+                    <select id="book-status">
+                        <option value="available">Sẵn sàng (Có thể mượn)</option>
+                        <option value="borrowed">Đã cho mượn</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Xem Chi tiết Sách -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content detail-content">
+            <span class="close-detail">&times;</span>
+            <h2>Chi tiết sách</h2>
+            <div id="detail-info" class="detail-info">
+                <!-- Nội dung chi tiết được render bằng JS -->
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="btn-close-detail">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
