@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <!-- Font Awesome cho các icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -48,15 +50,17 @@
             <div class="search-filter">
                 <div class="search-box">
                     <i class="fa-solid fa-search"></i>
-                    <input type="text" id="search-input" placeholder="Tìm kiếm tên sách hoặc tác giả...">
+                    <input type="text" id="search-input" placeholder="Tìm kiếm người mượn hoặc tên sách...">
                 </div>
                 <select id="category-filter">
                     <option value="all">Tất cả thể loại</option>
-                    <option value="Giáo trình">Giáo trình</option>
-                    <option value="Sách tham khảo">Sách tham khảo</option>
-                    <option value="Văn học">Văn học</option>
-                    <option value="Khoa học">Khoa học</option>
-                    <option value="Công nghệ IT">Công nghệ IT</option>
+                    <option value="Toán học">Toán học</option>
+                    <option value="Ngữ văn / Tiếng Việt">Ngữ văn / Tiếng Việt</option>
+                    <option value="Tiếng Anh">Tiếng Anh</option>
+                    <option value="Khoa học Tự nhiên">Khoa học Tự nhiên</option>
+                    <option value="Lịch sử & Địa lý">Lịch sử & Địa lý</option>
+                    <option value="Đạo đức / GDCD">Đạo đức / Giáo dục công dân</option>
+                    <option value="Truyện thiếu nhi / Truyện tranh">Truyện thiếu nhi / Truyện tranh</option>
                     <option value="Khác">Khác</option>
                 </select>
             </div>
@@ -69,7 +73,7 @@
         <section class="book-grid" id="book-grid">
             <!-- Sách sẽ được render ở đây bằng JavaScript -->
         </section>
-        
+
         <div id="empty-state" class="empty-state" style="display: none;">
             <i class="fa-solid fa-folder-open"></i>
             <p>Không tìm thấy cuốn sách nào!</p>
@@ -83,29 +87,36 @@
             <h2 id="modal-title">Thêm Sách Mới</h2>
             <form id="book-form">
                 <input type="hidden" id="book-id">
-                
+
+                <div class="form-group">
+                    <label for="book-author">Người mượn sách</label>
+                    <input type="text" id="book-author" placeholder="Nhập tên người mượn...">
+                </div>
+
                 <div class="form-group">
                     <label for="book-title">Tên sách (*)</label>
                     <input type="text" id="book-title" required placeholder="Nhập tên sách...">
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="book-author">Tác giả (*)</label>
-                    <input type="text" id="book-author" required placeholder="Nhập tên tác giả...">
+                    <label for="book-borrow-date">Ngày cho mượn</label>
+                    <input type="date" id="book-borrow-date">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="book-category">Thể loại</label>
                     <select id="book-category">
-                        <option value="Giáo trình">Giáo trình</option>
-                        <option value="Sách tham khảo">Sách tham khảo</option>
-                        <option value="Văn học">Văn học</option>
-                        <option value="Khoa học">Khoa học</option>
-                        <option value="Công nghệ IT">Công nghệ IT</option>
+                        <option value="Toán học">Toán học</option>
+                        <option value="Ngữ văn / Tiếng Việt">Ngữ văn / Tiếng Việt</option>
+                        <option value="Tiếng Anh">Tiếng Anh</option>
+                        <option value="Khoa học Tự nhiên">Khoa học Tự nhiên</option>
+                        <option value="Lịch sử & Địa lý">Lịch sử & Địa lý</option>
+                        <option value="Đạo đức / GDCD">Đạo đức / Giáo dục công dân</option>
+                        <option value="Truyện thiếu nhi / Truyện tranh">Truyện thiếu nhi / Truyện tranh</option>
                         <option value="Khác">Khác</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="book-status">Trạng thái</label>
                     <select id="book-status">
@@ -138,4 +149,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
