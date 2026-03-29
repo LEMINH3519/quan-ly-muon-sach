@@ -30,7 +30,8 @@ const btnCloseDetailBtn = document.getElementById('btn-close-detail');
 // Form inputs
 const inputId = document.getElementById('book-id');
 const inputTitle = document.getElementById('book-title');
-const inputAuthor = document.getElementById('book-author');
+const inputAuthor = document.getElementById('book-author'); // Sẽ dùng cho người mượn
+const inputBorrowDate = document.getElementById('book-borrow-date'); // Thêm field ngày mượn
 const inputCategory = document.getElementById('book-category');
 const inputStatus = document.getElementById('book-status');
 const modalTitle = document.getElementById('modal-title');
@@ -41,11 +42,17 @@ function loadBooks() {
     const stored = localStorage.getItem('smart-library-books');
     if (stored) {
         books = JSON.parse(stored);
+        // Chuyển đổi author cũ sang borrower nếu có
+        books = books.map(b => ({
+            ...b,
+            borrower: b.borrower !== undefined ? b.borrower : (b.author || ""),
+            borrowDate: b.borrowDate || ""
+        }));
     } else {
         // Cấp một vài dữ liệu mẫu nếu chưa có
         books = [
-            { id: Date.now().toString(), title: "Cấu trúc dữ liệu và giải thuật", author: "Nguyễn Văn A", category: "Giáo trình", status: "available", isFav: false },
-            { id: (Date.now() + 1).toString(), title: "Nhập môn Lập trình Web", author: "Trần B", category: "Công nghệ IT", status: "borrowed", isFav: true }
+            { id: Date.now().toString(), title: "Toán học 6 (Tập 1)", borrower: "", borrowDate: "", category: "Toán học", status: "available", isFav: false },
+            { id: (Date.now() + 1).toString(), title: "Doraemon - Tập 1", borrower: "Người dùng 1", borrowDate: "2023-10-15", category: "Truyện thiếu nhi / Truyện tranh", status: "borrowed", isFav: true }
         ];
         saveToLocalStorage();
     }
@@ -55,7 +62,6 @@ function loadBooks() {
 function saveToLocalStorage() {
     localStorage.setItem('smart-library-books', JSON.stringify(books));
 }
-
 
 // --- 3. RENDER (HIỂN THỊ) DỮ LIỆU ---
 // Cập nhật các con số thống kê
@@ -77,7 +83,8 @@ function renderBooks() {
 
     // 2. Lọc mảng books dựa vào 2 điều kiện
     const filteredBooks = books.filter(book => {
-        const matchTitle = book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword);
+        const borrowerStr = book.borrower || '';
+        const matchTitle = book.title.toLowerCase().includes(keyword) || borrowerStr.toLowerCase().includes(keyword);
         const matchCategory = categoryQuery === 'all' || book.category === categoryQuery;
         return matchTitle && matchCategory;
     });
@@ -111,26 +118,42 @@ function renderBooks() {
         // Icon tim màu đỏ nếu isFav = true
         const heartClass = book.isFav ? 'fa-solid fa-heart active' : 'fa-regular fa-heart';
 
+        let borrowAction = '';
+        if (book.status === 'borrowed') {
+            borrowAction = `
+                <button class="btn-action" onclick="returnBook('${book.id}')" style="background-color: #28a745; color: white; border: none; flex: 1; padding: 5px;">
+                    <i class="fa-solid fa-check"></i> Đã trả
+                </button>
+            `;
+        }
+
+        const borrowerHtml = book.borrower ? `<div style="font-weight: bold; color: #007bff; margin-bottom: 5px; font-size: 0.95rem;"><i class="fa-solid fa-user"></i> Người mượn: ${book.borrower}</div>` : '';
+        const borrowDateHtml = book.borrowDate ? `<p class="book-date" style="font-size: 0.85rem; color: #555; margin-bottom: 10px;"><i class="fa-solid fa-calendar-alt"></i> Ngày mượn: ${book.borrowDate}</p>` : '';
+
         card.innerHTML = `
-            <div class="book-card-header">
-                <h3 class="book-title" onclick="openDetailModal('${book.id}')">${book.title}</h3>
+            <div class="book-card-header" style="align-items: flex-start; border-bottom: none; margin-bottom: 5px;">
+                <div style="flex: 1;">
+                    ${borrowerHtml}
+                    <h3 class="book-title" onclick="openDetailModal('${book.id}')" style="margin-top: 0; cursor: pointer;">${book.title}</h3>
+                </div>
                 <button class="btn-fav ${book.isFav ? 'active' : ''}" onclick="toggleFavorite('${book.id}')" title="Đánh dấu yêu thích">
                     <i class="${heartClass}"></i>
                 </button>
             </div>
             
-            <p class="book-author"><i class="fa-solid fa-pen-nib"></i> ${book.author}</p>
+            ${borrowDateHtml}
             
-            <div class="book-tags">
+            <div class="book-tags" style="margin-top: 10px;">
                 <span class="tag tag-category">${book.category}</span>
                 <span class="tag tag-status ${statusClass}">${statusText}</span>
             </div>
             
-            <div class="book-actions">
-                <button class="btn-action btn-edit" onclick="openEditModal('${book.id}')">
+            <div class="book-actions" style="gap: 5px; display: flex;">
+                ${borrowAction}
+                <button class="btn-action btn-edit" onclick="openEditModal('${book.id}')" style="padding: 5px; flex: 1;">
                     <i class="fa-solid fa-pen"></i> Sửa
                 </button>
-                <button class="btn-action btn-delete" onclick="deleteBook('${book.id}')">
+                <button class="btn-action btn-delete" onclick="deleteBook('${book.id}')" style="padding: 5px; flex: 1;">
                     <i class="fa-solid fa-trash"></i> Xóa
                 </button>
             </div>
@@ -138,7 +161,6 @@ function renderBooks() {
         bookGrid.appendChild(card);
     });
 }
-
 
 // --- 4. CÁC HÀM XỬ LÝ (CRUD) ---
 
@@ -157,13 +179,14 @@ formSubmit.addEventListener('submit', function(e) {
 
     // Lấy dữ liệu từ input
     const newTitle = inputTitle.value.trim();
-    const newAuthor = inputAuthor.value.trim();
+    const newBorrower = inputAuthor.value.trim();
+    const newBorrowDate = inputBorrowDate ? inputBorrowDate.value : "";
     const newCat = inputCategory.value;
     const newStatus = inputStatus.value;
     const currentId = inputId.value;
 
-    if (!newTitle || !newAuthor) {
-        alert("Vui lòng điền đủ tên sách và tác giả!");
+    if (!newTitle) {
+        alert("Vui lòng điền tên sách!");
         return;
     }
 
@@ -172,7 +195,8 @@ formSubmit.addEventListener('submit', function(e) {
         const index = books.findIndex(b => b.id === currentId);
         if (index > -1) {
             books[index].title = newTitle;
-            books[index].author = newAuthor;
+            books[index].borrower = newBorrower;
+            books[index].borrowDate = newBorrowDate;
             books[index].category = newCat;
             books[index].status = newStatus;
         }
@@ -181,7 +205,8 @@ formSubmit.addEventListener('submit', function(e) {
         const newBook = {
             id: Date.now().toString(), // Tạo ID duy nhất dựa theo mốc thời gian
             title: newTitle,
-            author: newAuthor,
+            borrower: newBorrower,
+            borrowDate: newBorrowDate,
             category: newCat,
             status: newStatus,
             isFav: false
@@ -203,7 +228,8 @@ window.openEditModal = function(id) {
     modalTitle.textContent = "Chỉnh Sửa Sách";
     inputId.value = book.id;
     inputTitle.value = book.title;
-    inputAuthor.value = book.author;
+    inputAuthor.value = book.borrower || '';
+    if (inputBorrowDate) inputBorrowDate.value = book.borrowDate || '';
     inputCategory.value = book.category;
     inputStatus.value = book.status;
 
@@ -216,6 +242,20 @@ window.deleteBook = function(id) {
         books = books.filter(b => b.id !== id);
         saveToLocalStorage();
         renderBooks();
+    }
+}
+
+// Xử lý nút Trả sách
+window.returnBook = function(id) {
+    const index = books.findIndex(b => b.id === id);
+    if (index > -1) {
+        if (confirm("Xác nhận người này đã trả sách?")) {
+            books[index].status = 'available';
+            books[index].borrower = '';
+            books[index].borrowDate = '';
+            saveToLocalStorage();
+            renderBooks();
+        }
     }
 }
 
@@ -240,7 +280,8 @@ window.openDetailModal = function(id) {
 
     detailContainer.innerHTML = `
         <p><strong>Tên sách:</strong> ${book.title}</p>
-        <p><strong>Tác giả:</strong> ${book.author}</p>
+        <p><strong>Người mượn:</strong> ${book.borrower || 'Không có'}</p>
+        <p><strong>Ngày mượn:</strong> ${book.borrowDate || 'Không có'}</p>
         <p><strong>Thể loại:</strong> ${book.category}</p>
         <p><strong>Trạng thái:</strong> ${statusText}</p>
         <p><strong>Yêu thích:</strong> ${favText}</p>
@@ -249,7 +290,6 @@ window.openDetailModal = function(id) {
 
     openModal(modalDetail);
 }
-
 
 // --- 5. LOGIC TÌM KIẾM, LỌC & MODAL UTILS ---
 
